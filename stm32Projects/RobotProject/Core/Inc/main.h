@@ -62,20 +62,20 @@ void Error_Handler(void);
 #define PWMA_GPIO_Port GPIOC
 #define PWMB_Pin GPIO_PIN_1
 #define PWMB_GPIO_Port GPIOC
-#define BLTTH_TX_Pin GPIO_PIN_4
-#define BLTTH_TX_GPIO_Port GPIOC
-#define STBY_Pin GPIO_PIN_6
-#define STBY_GPIO_Port GPIOC
-#define B2_Pin GPIO_PIN_8
-#define B2_GPIO_Port GPIOC
-#define B1_Pin GPIO_PIN_9
-#define B1_GPIO_Port GPIOC
-#define BLUTTH_RX_Pin GPIO_PIN_10
-#define BLUTTH_RX_GPIO_Port GPIOA
-#define A2_Pin GPIO_PIN_8
-#define A2_GPIO_Port GPIOB
-#define A1_Pin GPIO_PIN_9
-#define A1_GPIO_Port GPIOB
+#define BT_RXD_Pin GPIO_PIN_2
+#define BT_RXD_GPIO_Port GPIOA
+#define BT_TXD_Pin GPIO_PIN_3
+#define BT_TXD_GPIO_Port GPIOA
+#define A1_IN_Pin GPIO_PIN_10
+#define A1_IN_GPIO_Port GPIOB
+#define A2_IN_Pin GPIO_PIN_8
+#define A2_IN_GPIO_Port GPIOA
+#define B2_IN_Pin GPIO_PIN_3
+#define B2_IN_GPIO_Port GPIOB
+#define STBY_Pin GPIO_PIN_4
+#define STBY_GPIO_Port GPIOB
+#define B1_IN_Pin GPIO_PIN_5
+#define B1_IN_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
