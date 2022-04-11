@@ -58,10 +58,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define BLTTH_TX_Pin GPIO_PIN_6
-#define BLTTH_TX_GPIO_Port GPIOB
-#define BLTTH_RX_Pin GPIO_PIN_7
+#define BLTTH_RX_Pin GPIO_PIN_6
 #define BLTTH_RX_GPIO_Port GPIOB
+#define BLTTH_TX_Pin GPIO_PIN_7
+#define BLTTH_TX_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
