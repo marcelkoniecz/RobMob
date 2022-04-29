@@ -1,2 +1,3 @@
 # RobMob
-Projekt Roboty Mobilne
+Projekt robota mobilnego sterowanego rekawiczka
+
