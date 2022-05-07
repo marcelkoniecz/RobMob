@@ -19,13 +19,17 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "dma.h"
 #include "i2c.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
 #include "mpu6050.h"
+#include "parser.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -35,6 +39,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define TxBuff_SIZE 24
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -45,7 +50,10 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-MPU6050_t MPU6050;
+uint8_t f_initialized = 0;
+
+MPU6050_t mpu;
+uint8_t TxBuff[TxBuff_SIZE];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -56,7 +64,21 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
+{
+    if(htim == &htim2)
+    {
+    	if(f_initialized == 1)
+    	{
+    		MPU6050_Read_All(&hi2c1, &mpu);
+    		if(ParseAccelAngles(TxBuff, TxBuff_SIZE, &mpu) == HAL_OK)
+    		{
+    			HAL_UART_Transmit_DMA(&huart1, TxBuff, TxBuff_SIZE);
+    			HAL_UART_Transmit(&huart2, TxBuff, TxBuff_SIZE, HAL_MAX_DELAY);
+    		}
+    	}
+    }
+}
 /* USER CODE END 0 */
 
 /**
@@ -88,9 +110,25 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
+  MX_DMA_Init();
+  MX_TIM2_Init();
   MX_USART1_UART_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  while(MPU6050_Init(&hi2c1)==1) {}
+
+  if(MPU6050_Init(&hi2c1))
+  {
+	  Error_Handler();
+  }
+
+  if (HAL_TIM_Base_Start_IT(&htim2) != HAL_OK)
+  {
+	  Error_Handler();
+  }
+
+  f_initialized = 1;
+  printf("TEST\r\n");
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -100,9 +138,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  MPU6050_Read_All(&hi2c1, &MPU6050);
-
-	  HAL_Delay(100);
   }
   /* USER CODE END 3 */
 }
@@ -148,8 +183,10 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_I2C1;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_USART2
+                              |RCC_PERIPHCLK_I2C1;
   PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK2;
+  PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
   PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
