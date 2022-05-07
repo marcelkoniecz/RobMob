@@ -90,7 +90,7 @@ int main(void)
   MX_I2C1_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  while(MPU6050_Init(&hi2c1)==1)
+  while(MPU6050_Init(&hi2c1)==1) {}
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -101,6 +101,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	  MPU6050_Read_All(&hi2c1, &MPU6050);
+
 	  HAL_Delay(100);
   }
   /* USER CODE END 3 */

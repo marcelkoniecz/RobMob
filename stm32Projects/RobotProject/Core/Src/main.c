@@ -25,7 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "encontrol.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
