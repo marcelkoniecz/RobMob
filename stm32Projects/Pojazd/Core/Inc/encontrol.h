@@ -8,8 +8,9 @@
 
 #define MAX_DEGREE 100.0
 #define PWM_MAX_VAL 999									//MAX PWM
-#define PWM_MIN_VAL (PWM_MAX_VAL*0.4)					//40% MAX PWM
-#define NO_ACCTBL_VALUE 10.0                              //wartosc dla ktorej wystepuje minimalne poruszenie
+#define PWM_MIN_VAL (PWM_MAX_VAL*0.3)					//40% MAX PWM
+#define NO_ACCTBL_VALUE 15.0                            //wartosc dla ktorej wystepuje minimalne poruszenie
+#define NO_TURN_VALUE 70.0                            	//wartosc dla ktorej nie skręcamy
 #define CONST_CONVERT ((PWM_MAX_VAL- PWM_MIN_VAL)/100) //obliczenie stalej do pwm
 
 

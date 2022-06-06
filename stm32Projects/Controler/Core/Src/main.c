@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
 #include "i2c.h"
 #include "tim.h"
 #include "usart.h"
@@ -38,6 +39,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define TxBuf_SIZE 24
+#define FORCE_LIMIT 1000
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -51,6 +53,8 @@
 uint8_t f_initialized = 0;
 
 MPU6050_t mpu;
+MPU6050_t mpu_empty = {0};
+uint32_t value;
 uint8_t TxBuf[TxBuf_SIZE];
 /* USER CODE END PV */
 
@@ -68,12 +72,39 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
     {
     	if(f_initialized == 1)
     	{
-    		MPU6050_Read_All(&hi2c1, &mpu);
-    		if(ParseAccelAngles(TxBuf, TxBuf_SIZE, &mpu) == HAL_OK)
+    		if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK)
     		{
-    			HAL_UART_Transmit(&huart1, TxBuf, TxBuf_SIZE,100);
-    			HAL_UART_Transmit(&huart2, TxBuf, TxBuf_SIZE,100);
-    			HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
+				value = HAL_ADC_GetValue(&hadc1);
+				HAL_ADC_Start(&hadc1);
+    		}
+    		else
+    		{
+    			if(ParseAccelAngles(TxBuf, TxBuf_SIZE, &mpu_empty) == HAL_OK)
+				{
+					HAL_UART_Transmit(&huart1, TxBuf, TxBuf_SIZE,100);
+					HAL_UART_Transmit(&huart2, TxBuf, TxBuf_SIZE,100);
+					HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
+				}
+    		}
+
+    		if(value > FORCE_LIMIT)
+    		{
+        		MPU6050_Read_All(&hi2c1, &mpu);
+        		if(ParseAccelAngles(TxBuf, TxBuf_SIZE, &mpu) == HAL_OK)
+        		{
+        			HAL_UART_Transmit(&huart1, TxBuf, TxBuf_SIZE,100);
+        			HAL_UART_Transmit(&huart2, TxBuf, TxBuf_SIZE,100);
+        			HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
+        		}
+    		}
+    		else
+    		{
+    			if(ParseAccelAngles(TxBuf, TxBuf_SIZE, &mpu_empty) == HAL_OK)
+				{
+					HAL_UART_Transmit(&huart1, TxBuf, TxBuf_SIZE,100);
+					HAL_UART_Transmit(&huart2, TxBuf, TxBuf_SIZE,100);
+					HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
+				}
     		}
     	}
     }
@@ -112,6 +143,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_TIM2_Init();
   MX_USART2_UART_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
   if(MPU6050_Init(&hi2c1))
     {
@@ -122,6 +154,8 @@ int main(void)
     {
   	  Error_Handler();
     }
+
+    HAL_ADC_Start(&hadc1);
 
     f_initialized = 1;
   //HAL_UART_Transmit(&huart1, test, 4, 10);
